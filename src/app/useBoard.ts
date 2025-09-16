@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { BoardContext, type Ctx } from "./BoardProvider";
+import { BoardContext, type Ctx } from "./BoardContext";
 
 export function useBoard(): Ctx {
   const ctx = useContext(BoardContext);

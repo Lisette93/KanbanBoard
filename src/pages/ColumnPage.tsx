@@ -1,19 +1,33 @@
-import { useBoard } from "../app/useBoard";
-import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useBoard } from "../app/useBoard";
+import ColumnView from "../components/ColumnView";
+import type { Task } from "../app/types";
 
 export default function ColumnPage() {
-  //Hooks
+  // Hooks
   const { columnId } = useParams<{ columnId: string }>();
   const { state, dispatch } = useBoard();
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
 
-  // Guard clauses
-  if (!columnId) return <p>No column given.</p>;
+  // Guards
+  if (!columnId)
+    return <main className="p-6 text-white">No column given.</main>;
   const column = state.columns[columnId];
-  if (!column) return <p>Column with id {columnId} not found.</p>;
+  if (!column)
+    return (
+      <main className="p-6 text-white">
+        Column with id {columnId} not found.
+      </main>
+    );
 
-  // Submit handler (ADD_TASK)
+  // Build tasks ONCE (rename if you prefer)
+  const tasks: Task[] = column.taskIds
+    .map((id) => state.tasks[id])
+    .filter((t): t is Task => Boolean(t));
+
+  // Create task
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const trimmed = title.trim();
@@ -23,21 +37,46 @@ export default function ColumnPage() {
     dispatch({
       type: "ADD_TASK",
       payload: {
-        columnId,
+        columnId: column.id,
         task: { id, title: trimmed, createdAt: new Date().toISOString() },
       },
     });
     setTitle("");
   }
 
-  // Tasks to render
-  const tasks = column.taskIds.map((id) => state.tasks[id]).filter(Boolean);
+  // Callbacks (use or leave for later)
+  function openTask(taskId: string) {
+    navigate(`/task/${taskId}`); // funkar även som placeholder
+  }
+
+  function moveTask(taskId: string, dir: "left" | "right") {
+    const activeBoardId = state.ui.activeBoardId;
+    if (!activeBoardId) return;
+    const board = state.boards[activeBoardId];
+
+    const fromColumnId = column.id;
+    const idx = board.columnOrder.indexOf(fromColumnId);
+    const toColumnId =
+      dir === "left" ? board.columnOrder[idx - 1] : board.columnOrder[idx + 1];
+    if (!toColumnId) return;
+
+    // Avkommentera när du har reducer-case:
+    // dispatch({
+    //   type: "MOVE_TASK",
+    //   payload: { taskId, fromColumnId, toColumnId, toIndex: state.columns[toColumnId].taskIds.length },
+    // });
+  }
+
+  function deleteTask(taskId: string) {
+    // Avkommentera när du har reducer-case:
+    // dispatch({ type: "DELETE_TASK", payload: { taskId, columnId: column.id } });
+  }
 
   return (
     <main className="p-6 text-white">
-      <h1 className="text-xl font-semibold">{column.title}</h1>
+      <h1 className="text-xl font-semibold mb-4">{column.title}</h1>
 
-      {/*form: create new task*/}
+      {/* Create new task */}
       <form onSubmit={handleSubmit} className="flex gap-2 mb-4">
         <input
           value={title}
@@ -54,26 +93,16 @@ export default function ColumnPage() {
         </button>
       </form>
 
-      {/* Lista tasks */}
-      <section className="rounded-lg bg-neutral-900/80 p-4 min-h-[200px]">
-        {tasks.length === 0 ? (
-          <em className="opacity-70">Inga tasks ännu</em>
-        ) : (
-          <ul className="space-y-2">
-            {tasks.map((t) => (
-              <li
-                key={t.id}
-                className="rounded-md bg-neutral-800 px-3 py-2 flex items-center justify-between"
-              >
-                <span>{t.title}</span>
-                <span className="text-xs opacity-60">
-                  {new Date(t.createdAt).toLocaleDateString()}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      {/* Reusable column UI */}
+      <ColumnView
+        columnId={column.id}
+        title={column.title}
+        tasks={tasks}
+        onTaskClick={openTask}
+        onMoveLeft={(id) => moveTask(id, "left")}
+        onMoveRight={(id) => moveTask(id, "right")}
+        onDelete={deleteTask}
+      />
 
       <Link to="/" className="inline-block mt-4 underline">
         ← Tillbaka till board
