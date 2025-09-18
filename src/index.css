@@ -1,12 +1,21 @@
 @import "tailwindcss";
 
-@theme {
-  --color-mainBackgroundColor: "#0D1117";
-  --color-columnBackgroundColor: "#161C22";
+/* App background */
+body {
+  @apply bg-gradient-to-br from[var--color-olive] via-amber-100 to-fuchsia-200 text-neutral-100 min-h-screen;
 }
 
-html,
-body,
-#root {
-  @apply bg-black text-white box-border;
+@theme {
+  --color-olive: #708238;
+}
+/* Subtle scrollbars (Chromium) */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  @apply bg-neutral-700/70 rounded-full;
+}
+*::-webkit-scrollbar-track {
+  @apply bg-transparent;
 }

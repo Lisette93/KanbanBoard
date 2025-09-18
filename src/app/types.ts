@@ -5,6 +5,7 @@ export type Task = {
   title: string;
   description?: string;
   createdAt: string;
+  updatedAt?: string;
 };
 
 export type Column = {
