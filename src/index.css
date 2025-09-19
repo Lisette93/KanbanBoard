@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&family=Raleway:wght@400;600&display=swap");
 
 /* App background */
 body {
@@ -14,6 +15,7 @@ body {
   --color-arcticDaisy: #f5f4e6;
   --color-plumPurple: #59193c;
   --color-brownSugar: #6d5b38;
+  --font-Handlee: "Handlee";
 }
 /* Subtle scrollbars (Chromium) */
 *::-webkit-scrollbar {

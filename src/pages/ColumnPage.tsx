@@ -64,7 +64,7 @@ export default function ColumnPage() {
   }
 
   return (
-    <main className="p-6 text-white">
+    <main className="p-6 text-plumPurple">
       <h1 className="text-xl font-semibold mb-4">{column.title}</h1>
 
       {/* Inline create form for this column */}
@@ -73,11 +73,11 @@ export default function ColumnPage() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="New task title"
-          className="flex-1 rounded-md bg-neutral-800 px-3 py-2 outline-none"
+          className="flex-1 rounded-md bg-white px-3 py-2 outline-none"
         />
         <button
           type="submit"
-          className="rounded-md bg-blue-600 px-4 py-2 disabled:opacity-50"
+          className="rounded-md bg-peachBlossom/60 px-4 py-2 disabled:opacity-50"
           disabled={!title.trim()}
         >
           Add Task

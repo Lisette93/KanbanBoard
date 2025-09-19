@@ -38,6 +38,7 @@ export default function TaskCard({ task, onClick, onDelete }: TaskCardProps) {
         group cursor-pointer rounded-xl bg-white p-4 shadow-md
         transition hover:shadow-lg focus:outline-none
       "
+      style={{ touchAction: "none" }}
     >
       {/* Header row: small colored chip + delete button */}
       <div className="mb-2 flex items-center justify-between">

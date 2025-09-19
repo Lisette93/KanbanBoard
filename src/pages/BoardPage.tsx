@@ -3,9 +3,15 @@ import TaskEditor from "../components/TaskEditor";
 import { useBoard } from "../app/useBoard";
 import ColumnView from "../components/ColumnView";
 import type { Task } from "../app/types";
+import TaskCard from "../components/TaskCard";
+import { useOutletContext } from "react-router-dom";
+//import { Link } from "react-router-dom";
+
 import {
   closestCorners,
   DndContext,
+  DragOverlay,
+  type DragStartEvent,
   type DragEndEvent,
   useSensor,
   useSensors,
@@ -20,9 +26,15 @@ export default function BoardPage() {
   const { state, dispatch } = useBoard();
   const navigate = useNavigate();
 
+  const { createOpen, onCloseCreate } = useOutletContext<LayoutCtx>();
+
   // State for currently active task (for modal)
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+
+  const [activeDragTaskId, setActiveDragTaskId] = useState<string | null>(null);
+  const activeDragTask = activeDragTaskId
+    ? state.tasks[activeDragTaskId]
+    : undefined;
 
   // Build a light list of columns for the modal’s select
   const columnsLite = useMemo(
@@ -81,7 +93,13 @@ export default function BoardPage() {
   }
 
   // Handler for DnD end
+
+  function handleDragStart(e: DragStartEvent) {
+    // e.active.id är task-id:t (du använder taskId som draggable id)
+    setActiveDragTaskId(String(e.active.id));
+  }
   function handleDragEnd(e: DragEndEvent) {
+    setActiveDragTaskId(null);
     const activeId = String(e.active.id);
     const overId = e.over ? String(e.over.id) : undefined;
     if (!overId) return;
@@ -114,31 +132,20 @@ export default function BoardPage() {
 
   return (
     <main className="p-6">
-      {/* Top bar with global Add button */}
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl ml-25 font-semibold">KANBAN BOARD</h1>
-        <button
-          type="button"
-          onClick={() => setIsCreateOpen(true)}
-          className="rounded-md mr-25 bg-peachBlossom/60 px-4 py-2"
-        >
-          + Add New Task
-        </button>
-      </div>
-
       {/* DnD Context */}
       <DndContext
         sensors={sensors}
+        onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         collisionDetection={closestCorners}
       >
         <div className="w-screen -mx-6 px-0 mt-8 sm:max-w-7xl sm:mx-auto sm:px-6">
           <div
-            className="relative p-6 mt-8 rounded-2xl bg-cover bg-center"
+            className="relative p-6 mt-8 rounded-2xl overflow-hidden bg-cover bg-center"
             style={{ backgroundImage: `url(${bgImage})` }}
           >
             {/* Overlay */}
-            <div className="absolute inset-0 bg-white/40 backdrop-blur-sm" />
+            <div className="absolute inset-0 bg-white/40 pointer-events-none" />
 
             {/* content layer */}
             <div className="relative z-10 p-4 sm:p-6 lg:p-8">
@@ -162,7 +169,7 @@ export default function BoardPage() {
                   return (
                     <div
                       key={col.id}
-                      className="flex-shrink-0 min-w-full snap-center sm:min-w-0"
+                      className="flex-shrink-0 min-w-[85%] snap-center sm:min-w-0"
                     >
                       <ColumnView
                         columnId={col.id}
@@ -184,12 +191,19 @@ export default function BoardPage() {
             </div>
           </div>
         </div>
+        <DragOverlay>
+          {activeDragTask ? (
+            <div className="w-[280px] max-w-[90vw]">
+              <TaskCard task={activeDragTask} />
+            </div>
+          ) : null}
+        </DragOverlay>
       </DndContext>
 
       {/* Create task modal */}
       <CreateTaskModal
-        isOpen={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
+        isOpen={createOpen}
+        onClose={onCloseCreate}
         columns={columnsLite}
         defaultColumnId={defaultColumnId}
         onCreate={handleCreateTask}

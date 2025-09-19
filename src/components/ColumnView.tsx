@@ -35,13 +35,13 @@ export default function ColumnView({
   // Define text colors for each column based on its ID.
   const columnTextColors: Record<string, string> = {
     todo: "text-plumPurple",
-    doing: "text-BrownSugar/60",
+    doing: "text-brownSugar/80",
     done: "text-arcticDaisy",
   };
 
   const columnUnderlineColors: Record<string, string> = {
     todo: "bg-plumPurple",
-    doing: "bg-brownSugar/60",
+    doing: "bg-brownSugar/80",
     done: "bg-arcticDaisy",
   };
 
