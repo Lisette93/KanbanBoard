@@ -4,7 +4,7 @@ export const initialState: AppState = {
   boards: {
     "board-1": {
       id: "board-1",
-      name: "The Board App",
+      name: "Kanban Board",
       columnOrder: ["todo", "doing", "done"],
     },
   },

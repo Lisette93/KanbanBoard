@@ -2,11 +2,21 @@
 
 /* App background */
 body {
-  @apply bg-gradient-to-br from[var--color-olive] via-amber-100 to-fuchsia-200 text-neutral-100 min-h-screen;
+  @apply bg-arcticDaisy font-sans text-plumPurple min-h-screen;
+  font-family: "raleway", sans-serif;
 }
 
 @theme {
-  --color-olive: #708238;
+  --color-bgColor: #f9f9f4;
+  --color-olive: #858061;
+  --color-warmBeige: #d6c9b4;
+  --color-skyBlue: #b8c9db;
+  --color-roseBlush: #98553e;
+  --color-peachBlossom: #bb8588;
+  --color-arcticDaisy: #f5f4e6;
+  --color-goldenClover: #d7ce93;
+  --color-plumPurple: #59193c;
+  --color-brownSugar: #6d5b38;
 }
 /* Subtle scrollbars (Chromium) */
 *::-webkit-scrollbar {

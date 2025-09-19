@@ -3,10 +3,18 @@ import TaskEditor from "../components/TaskEditor";
 import { useBoard } from "../app/useBoard";
 import ColumnView from "../components/ColumnView";
 import type { Task } from "../app/types";
-import { closestCorners, DndContext, type DragEndEvent } from "@dnd-kit/core";
+import {
+  closestCorners,
+  DndContext,
+  type DragEndEvent,
+  useSensor,
+  useSensors,
+  PointerSensor,
+} from "@dnd-kit/core";
 import { useNavigate } from "react-router-dom";
 import { useState, useMemo } from "react";
 import CreateTaskModal from "../components/CreateTaskModal";
+import bgImage from "../assets/images/pexels-louisabettes-captures-695499372-18016650.jpg";
 
 export default function BoardPage() {
   const { state, dispatch } = useBoard();
@@ -24,6 +32,12 @@ export default function BoardPage() {
         .filter(Boolean)
         .map((c) => ({ id: c.id, title: c.title })),
     [state]
+  );
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 6 },
+    })
   );
 
   // Decide the default column (usually “todo”, or just the first in order)
@@ -96,46 +110,62 @@ export default function BoardPage() {
   const activeTask = activeTaskId ? state.tasks[activeTaskId] : undefined;
 
   return (
-    <main className="p-6 text-white">
+    <main className="p-6">
       {/* Top bar with global Add button */}
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-semibold">{board.name}</h1>
         <button
           type="button"
           onClick={() => setIsCreateOpen(true)}
-          className="rounded-md bg-blue-600 px-4 py-2"
+          className="rounded-md bg-peachBlossom/60 px-4 py-2"
         >
           + Add New Task
         </button>
       </div>
 
-      <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
-        <div className="grid grid-cols-3 gap-4 mt-4">
-          {board.columnOrder.map((colId) => {
-            const col = state.columns[colId];
-            if (!col) return null;
+      {/* DnD Context */}
+      <DndContext
+        sensors={sensors}
+        onDragEnd={handleDragEnd}
+        collisionDetection={closestCorners}
+      >
+        <div className="mx-auto max-w-7xl px-6 mt-8">
+          <div
+            className=" relative mx-auto max-w-7xl p-6 px-6 mt-8 rounded-2xl bg-cover bg-center"
+            style={{ backgroundImage: `url(${bgImage})` }}
+          >
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-white/40" />
 
-            const tasks: Task[] = col.taskIds
-              .map((id) => state.tasks[id])
-              .filter((t): t is Task => Boolean(t));
+            {/* Content */}
+            <div className=" relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-stretch">
+              {board.columnOrder.map((colId) => {
+                const col = state.columns[colId];
+                if (!col) return null;
 
-            return (
-              <ColumnView
-                key={col.id}
-                columnId={col.id}
-                title={col.title}
-                tasks={tasks}
-                onTaskClick={(id) => setActiveTaskId(id)}
-                onDelete={(taskId) =>
-                  dispatch({
-                    type: "DELETE_TASK",
-                    payload: { taskId, columnId: col.id },
-                  })
-                }
-                onHeaderClick={() => navigate(`/column/${col.id}`)}
-              />
-            );
-          })}
+                const tasks: Task[] = col.taskIds
+                  .map((id) => state.tasks[id])
+                  .filter((t): t is Task => Boolean(t));
+
+                return (
+                  <ColumnView
+                    key={col.id}
+                    columnId={col.id}
+                    title={col.title}
+                    tasks={tasks}
+                    onTaskClick={(id) => setActiveTaskId(id)}
+                    onDelete={(taskId) =>
+                      dispatch({
+                        type: "DELETE_TASK",
+                        payload: { taskId, columnId: col.id },
+                      })
+                    }
+                    onHeaderClick={() => navigate(`/column/${col.id}`)}
+                  />
+                );
+              })}
+            </div>
+          </div>
         </div>
       </DndContext>
 
