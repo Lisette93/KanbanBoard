@@ -7,9 +7,7 @@ type ModalProps = {
 };
 
 export default function Modal({ isOpen, onClose, children }: ModalProps) {
-  /**
-   * Close the modal when the user presses the Escape key.
-   */
+  // Close on Escape
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -17,28 +15,39 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
-
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
       aria-label="Task details"
     >
-      {/* Overlay/backdrop – klick här stänger */}
-      <div className="fixed inset-0 bg-black/60" onClick={onClose} />
+      {/* Backdrop */}
+      <button
+        aria-label="Close"
+        onClick={onClose}
+        className="absolute inset-0 bg-white/60"
+      />
 
-      {/* Center wrapper */}
-      <div className="fixed inset-0 flex items-center justify-center p-4">
-        {/* Själva dialogen – stoppa klick från att bubbla och stänga */}
-        <div
-          className="w-full max-w-md rounded-xl bg-neutral-900 p-4 shadow-xl"
-          onClick={(e) => e.stopPropagation()}
+      {/* Dialog */}
+      <div
+        className="relative w-full max-w-lg sm:max-w-xl rounded-2xl bg-peachBlossom/60 p-4 sm:p-5 shadow-2xl
+                    backdrop-blur-md
+                   animate-[fadeIn_.15s_ease-out]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute right-3 top-3 rounded-full px-2 py-1 text-brownSugar hover:text-brownSugar"
+          aria-label="Close dialog"
         >
-          {children}
-        </div>
+          ✕
+        </button>
+
+        {children}
       </div>
     </div>
   );

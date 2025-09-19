@@ -53,7 +53,7 @@ export default function CreateTaskModal({
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded-md bg-neutral-800 px-3 py-2 outline-none"
+            className="w-full rounded-md bg-white px-3 py-2 outline-none"
             placeholder="Task title"
           />
         </div>
@@ -63,7 +63,7 @@ export default function CreateTaskModal({
           <select
             value={columnId}
             onChange={(e) => setColumnId(e.target.value)}
-            className="w-full rounded-md bg-neutral-800 px-3 py-2 outline-none"
+            className="w-full rounded-md bg-white px-3 py-2 outline-none"
           >
             {columns.map((c) => (
               <option key={c.id} value={c.id}>
@@ -78,7 +78,7 @@ export default function CreateTaskModal({
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full min-h-[100px] rounded-md bg-neutral-800 px-3 py-2 outline-none"
+            className="w-full min-h-[100px] rounded-md bg-white px-3 py-2 outline-none"
             placeholder="Notes…"
           />
         </div>
@@ -87,13 +87,13 @@ export default function CreateTaskModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-md bg-neutral-700 px-3 py-2"
+            className="rounded-md ring-1 ring-plumPurple/50  bg-arcticDaisy px-3 py-2"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="rounded-md bg-blue-600 px-3 py-2 disabled:opacity-50"
+            className="rounded-md bg-warmBeige ring-1 ring-plumPurple/50 px-3 py-2 disabled:opacity-50"
             disabled={!title.trim()}
           >
             Add task

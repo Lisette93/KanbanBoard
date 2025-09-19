@@ -34,15 +34,25 @@ export default function BoardPage() {
     [state]
   );
 
+  // Make drag require a tiny movement → clicks won't be eaten by DnD
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 6 },
     })
   );
 
+  //Wich board is active
+  const activeBoardId = state.ui.activeBoardId;
+  if (!activeBoardId)
+    return <p className="p-6 text-white">No board is active yet.</p>;
+
+  //Get the active board
+  const board = state.boards[activeBoardId];
+
   // Decide the default column (usually “todo”, or just the first in order)
   const defaultColumnId = columnsLite[0]?.id ?? "todo";
 
+  // Create a new task (from global + button)
   function handleCreateTask(data: {
     title: string;
     columnId: string;
@@ -63,14 +73,7 @@ export default function BoardPage() {
     });
   }
 
-  //Wich board is active
-  const activeBoardId = state.ui.activeBoardId;
-  if (!activeBoardId)
-    return <p className="p-6 text-white">No board is active yet.</p>;
-
-  //Get the active board
-  const board = state.boards[activeBoardId];
-
+  // Utility: find which column currently contains a task id
   function getColumnIdByTaskId(taskId: string): string | undefined {
     return board.columnOrder.find((colId) =>
       state.columns[colId].taskIds.includes(taskId)
@@ -117,7 +120,7 @@ export default function BoardPage() {
         <button
           type="button"
           onClick={() => setIsCreateOpen(true)}
-          className="rounded-md bg-peachBlossom/60 px-4 py-2"
+          className="rounded-md  bg-peachBlossom/60 px-4 py-2"
         >
           + Add New Task
         </button>
@@ -129,41 +132,55 @@ export default function BoardPage() {
         onDragEnd={handleDragEnd}
         collisionDetection={closestCorners}
       >
-        <div className="mx-auto max-w-7xl px-6 mt-8">
+        <div className="w-screen -mx-6 px-0 mt-8 sm:max-w-7xl sm:mx-auto sm:px-6">
           <div
-            className=" relative mx-auto max-w-7xl p-6 px-6 mt-8 rounded-2xl bg-cover bg-center"
+            className="relative p-6 mt-8 rounded-2xl bg-cover bg-center"
             style={{ backgroundImage: `url(${bgImage})` }}
           >
             {/* Overlay */}
-            <div className="absolute inset-0 bg-white/40" />
+            <div className="absolute inset-0 bg-white/40 backdrop-blur-sm" />
 
-            {/* Content */}
-            <div className=" relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-stretch">
-              {board.columnOrder.map((colId) => {
-                const col = state.columns[colId];
-                if (!col) return null;
+            {/* content layer */}
+            <div className="relative z-10 p-4 sm:p-6 lg:p-8">
+              <div
+                className="
+            flex gap-4 overflow-x-auto snap-x snap-mandatory pb-3
+            [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
+            sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:pb-0
+            lg:grid-cols-3
+            w-full
+          "
+              >
+                {board.columnOrder.map((colId) => {
+                  const col = state.columns[colId];
+                  if (!col) return null;
 
-                const tasks: Task[] = col.taskIds
-                  .map((id) => state.tasks[id])
-                  .filter((t): t is Task => Boolean(t));
+                  const tasks: Task[] = col.taskIds
+                    .map((id) => state.tasks[id])
+                    .filter((t): t is Task => Boolean(t));
 
-                return (
-                  <ColumnView
-                    key={col.id}
-                    columnId={col.id}
-                    title={col.title}
-                    tasks={tasks}
-                    onTaskClick={(id) => setActiveTaskId(id)}
-                    onDelete={(taskId) =>
-                      dispatch({
-                        type: "DELETE_TASK",
-                        payload: { taskId, columnId: col.id },
-                      })
-                    }
-                    onHeaderClick={() => navigate(`/column/${col.id}`)}
-                  />
-                );
-              })}
+                  return (
+                    <div
+                      key={col.id}
+                      className="flex-shrink-0 min-w-full snap-center sm:min-w-0"
+                    >
+                      <ColumnView
+                        columnId={col.id}
+                        title={col.title}
+                        tasks={tasks}
+                        onTaskClick={(id) => setActiveTaskId(id)}
+                        onDelete={(taskId) =>
+                          dispatch({
+                            type: "DELETE_TASK",
+                            payload: { taskId, columnId: col.id },
+                          })
+                        }
+                        onHeaderClick={() => navigate(`/column/${col.id}`)}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -178,6 +195,7 @@ export default function BoardPage() {
         onCreate={handleCreateTask}
       />
 
+      {/* Task details / edit modal */}
       <Modal isOpen={!!activeTask} onClose={() => setActiveTaskId(null)}>
         {activeTask && (
           <TaskEditor
