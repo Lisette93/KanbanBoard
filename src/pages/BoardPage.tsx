@@ -116,11 +116,11 @@ export default function BoardPage() {
     <main className="p-6">
       {/* Top bar with global Add button */}
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-semibold">{board.name}</h1>
+        <h1 className="text-2xl ml-25 font-semibold">KANBAN BOARD</h1>
         <button
           type="button"
           onClick={() => setIsCreateOpen(true)}
-          className="rounded-md  bg-peachBlossom/60 px-4 py-2"
+          className="rounded-md mr-25 bg-peachBlossom/60 px-4 py-2"
         >
           + Add New Task
         </button>

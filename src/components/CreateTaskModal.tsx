@@ -83,17 +83,10 @@ export default function CreateTaskModal({
           />
         </div>
 
-        <div className="flex justify-end gap-2 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md ring-1 ring-plumPurple/50  bg-arcticDaisy px-3 py-2"
-          >
-            Cancel
-          </button>
+        <div className="flex justify-end pt-2">
           <button
             type="submit"
-            className="rounded-md bg-warmBeige ring-1 ring-plumPurple/50 px-3 py-2 disabled:opacity-50"
+            className="rounded-md text-arcticDaisy bg-olive/80 ring-1 ring-arcticDaisy px-3 py-2 disabled:opacity-50"
             disabled={!title.trim()}
           >
             Add task

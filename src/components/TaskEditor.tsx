@@ -37,7 +37,7 @@ export default function TaskEditor({
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full rounded-md bg-neutral-800 px-3 py-2 outline-none"
+          className="w-full rounded-md bg-white px-3 py-2 outline-none"
           placeholder="Task title"
         />
       </div>
@@ -47,7 +47,7 @@ export default function TaskEditor({
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full min-h-[120px] rounded-md bg-neutral-800 px-3 py-2 outline-none"
+          className="w-full min-h-[120px] rounded-md bg-white px-3 py-2 outline-none"
           placeholder="Write something…"
         />
       </div>
@@ -56,27 +56,18 @@ export default function TaskEditor({
         <button
           type="button"
           onClick={onDelete}
-          className="rounded-md bg-red-600 px-3 py-2"
+          className="rounded-md text-peachBlossom bg-plumPurple ring-1 ring-peachBlossom px-3 py-2"
         >
           Delete
         </button>
 
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={onCancel}
-            className="rounded-md bg-neutral-700 px-3 py-2"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="rounded-md bg-blue-600 px-3 py-2 disabled:opacity-50"
-            disabled={!title.trim()}
-          >
-            Save
-          </button>
-        </div>
+        <button
+          type="submit"
+          className="rounded-md text-arcticDaisy bg-olive/80 ring-1 ring-arcticDaisy px-3 py-2 disabled:opacity-50"
+          disabled={!title.trim()}
+        >
+          Save
+        </button>
       </div>
     </form>
   );
