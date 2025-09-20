@@ -1,5 +1,6 @@
 import type { AppState, Task } from "./types";
 
+// --- Initial global state ---
 export const initialState: AppState = {
   boards: {
     "board-1": {
@@ -17,7 +18,7 @@ export const initialState: AppState = {
   ui: { activeBoardId: "board-1" },
 };
 
-// --- Actions ---
+// --- Action types ---
 export type AddTaskAction = {
   type: "ADD_TASK";
   payload: {
@@ -49,13 +50,14 @@ type DeleteTaskAction = {
   payload: { taskId: string; columnId: string };
 };
 
+// All possible actions
 export type Action =
   | AddTaskAction
   | MoveTaskAction
   | UpdateTaskAction
   | DeleteTaskAction;
 
-// --- Helper immutability ---
+// --- Immutable array helpers ---
 function removeAt<T>(arr: T[], index: number) {
   const copy = arr.slice();
   copy.splice(index, 1);
@@ -67,6 +69,8 @@ function insertAt<T>(arr: T[], index: number, item: T) {
   return copy;
 }
 
+// --- Reducer function ---
+// Handles state transitions based on dispatched actions
 export function reducer(state: AppState, action: Action): AppState {
   switch (action.type) {
     case "ADD_TASK": {
@@ -90,14 +94,14 @@ export function reducer(state: AppState, action: Action): AppState {
       const to = state.columns[toColumnId];
       if (!from || !to) return state;
 
-      // 1) ta bort från source
+      // remove from source column
       const fromIdx = from.taskIds.indexOf(taskId);
       if (fromIdx === -1) return state;
 
       const newFromIds = removeAt(from.taskIds, fromIdx);
 
-      // 2) om samma kolumn och vi tar bort ovanför insättningsindex,
-      //    minskar target-index med 1
+      // If same column and task moved downward,
+      // adjust target index to account for removal
       let targetIndex = toIndex;
       if (fromColumnId === toColumnId && fromIdx < toIndex) {
         targetIndex = Math.max(0, toIndex - 1);
@@ -106,7 +110,7 @@ export function reducer(state: AppState, action: Action): AppState {
       // clamp för säkerhets skull
       targetIndex = Math.max(0, Math.min(targetIndex, to.taskIds.length));
 
-      // 3) bygg nya toIds
+      // build new target array
       const baseToIds =
         fromColumnId === toColumnId ? newFromIds : to.taskIds.slice();
 
@@ -139,13 +143,14 @@ export function reducer(state: AppState, action: Action): AppState {
       };
     }
 
-    // ...DELETE_TASK...
     case "DELETE_TASK": {
       const { taskId, columnId } = action.payload;
       const col = state.columns[columnId];
       if (!col || !state.tasks[taskId]) return state;
 
+      //remove task from tasks object
       const { [taskId]: _, ...restTasks } = state.tasks;
+
       return {
         ...state,
         tasks: restTasks,

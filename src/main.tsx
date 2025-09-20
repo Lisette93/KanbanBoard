@@ -5,6 +5,11 @@ import { RouterProvider } from "react-router-dom";
 import { router } from "./routes";
 import BoardProvider from "./app/BoardProvider";
 
+/* - Entry point for React app.
+  - Mounts ReactDOM, wraps App with BrowserRouter and BoardProvider (global state).
+  - Renders the routes inside App.
+ */
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BoardProvider>

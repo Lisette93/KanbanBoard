@@ -17,6 +17,14 @@ type ColumnViewProps = {
   onHeaderClick?: () => void;
 };
 
+/**
+ * ColumnView
+ * ----------
+ * - Registers the column as a droppable area (so tasks can be dropped here).
+ * - Renders each task as a draggable item (so tasks can be dragged between columns).
+ * - Purely presentational beyond DnD wiring; actual reordering/moving is handled by the parent via reducer.
+ */
+
 export default function ColumnView({
   columnId,
   title,
@@ -25,14 +33,12 @@ export default function ColumnView({
   onDelete,
   onHeaderClick,
 }: ColumnViewProps) {
-  // Define background colors for each column based on its ID.
   const columnColors: Record<string, string> = {
     todo: "bg-skyBlue/70",
     doing: "bg-warmBeige/60",
     done: "bg-olive/60",
   };
 
-  // Define text colors for each column based on its ID.
   const columnTextColors: Record<string, string> = {
     todo: "text-plumPurple",
     doing: "text-brownSugar/80",
@@ -45,8 +51,7 @@ export default function ColumnView({
     done: "bg-arcticDaisy",
   };
 
-  // Make the whole column droppable so you can drop into empty columns.
-  // The droppable id is the column id.
+  // Make the whole column droppable
   const { setNodeRef } = useDroppable({ id: columnId });
 
   return (
@@ -55,6 +60,7 @@ export default function ColumnView({
         columnColors[columnId] ?? "bg-n"
       } min-h-[80vh]`}
     >
+      {/* Header */}
       <header
         className="mb-4 text-center cursor-pointer"
         onClick={onHeaderClick}

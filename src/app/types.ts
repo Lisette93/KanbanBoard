@@ -26,3 +26,8 @@ export type AppState = {
   tasks: Record<ID, Task>;
   ui: { activeBoardId: ID | null };
 };
+
+export type LayoutCtx = {
+  createOpen: boolean;
+  onCloseCreate: () => void;
+};

@@ -1,35 +1,47 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useBoard } from "../app/useBoard";
 import ColumnView from "../components/ColumnView";
-import type { Task } from "../app/types";
+import type { Task, Column } from "../app/types";
 
 export default function ColumnPage() {
-  // Read the URL param and global board state
   const { columnId } = useParams<{ columnId: string }>();
   const { state, dispatch } = useBoard();
   const navigate = useNavigate();
 
-  // Local input state for the "add task" form
   const [title, setTitle] = useState("");
 
-  // Lookup the column; bail if it doesn't exist
-  const column = columnId ? state.columns[columnId] : undefined;
-
-  // Derive this column's task objects (id -> Task). Filter out any stale ids.
-  const tasks: Task[] = useMemo(() => {
-    const ids = column ? column.taskIds : [];
-    return ids
-      .map((id) => state.tasks[id])
-      .filter((t): t is Task => Boolean(t));
-  }, [column, state.tasks]);
-
-  // Guard: no id supplied
+  // Guard 1: no column id in URL
   if (!columnId) {
     return <main className="p-6 text-white">No column given.</main>;
   }
 
-  // Submit handler: create a new task in *this* column
+  // Look up the column by id
+  const col: Column | undefined = state.columns[columnId];
+
+  // Guard 2: invalid id
+  if (!col) {
+    return (
+      <main className="p-6 text-white">
+        Unknown column: <code>{columnId}</code>
+        <div className="mt-4">
+          <Link to="/" className="underline">
+            ← Back to board
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  // Safe alias after guards
+  const column = col;
+
+  // Get all tasks for this column
+  const tasks: Task[] = column.taskIds
+    .map((id) => state.tasks[id])
+    .filter((t): t is Task => Boolean(t));
+
+  // Handle form submit, add a new task to this column
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const trimmed = title.trim();
@@ -39,18 +51,14 @@ export default function ColumnPage() {
     dispatch({
       type: "ADD_TASK",
       payload: {
-        columnId: column.id, // use the validated column
-        task: {
-          id,
-          title: trimmed,
-          createdAt: new Date().toISOString(),
-        },
+        columnId: column.id,
+        task: { id, title: trimmed, createdAt: new Date().toISOString() },
       },
     });
     setTitle("");
   }
 
-  // Open task details (for now, navigate; could be a modal later)
+  // Open a task (navigate to its page)
   function openTask(taskId: string) {
     navigate(`/task/${taskId}`);
   }
@@ -65,9 +73,10 @@ export default function ColumnPage() {
 
   return (
     <main className="p-6 text-plumPurple">
+      {/* Column title */}
       <h1 className="text-xl font-semibold mb-4">{column.title}</h1>
 
-      {/* Inline create form for this column */}
+      {/* Inline form to create a new task */}
       <form onSubmit={handleSubmit} className="flex gap-2 mb-4">
         <input
           value={title}
@@ -84,7 +93,7 @@ export default function ColumnPage() {
         </button>
       </form>
 
-      {/* Reusable column presentation (no header click in ColumnPage) */}
+      {/* Reuse ColumnView but without header click */}
       <ColumnView
         columnId={column.id}
         title={column.title}
@@ -93,6 +102,7 @@ export default function ColumnPage() {
         onDelete={deleteTask}
       />
 
+      {/* Link back to board page */}
       <Link to="/" className="inline-block mt-4 underline">
         ← Back to board
       </Link>

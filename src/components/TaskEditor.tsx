@@ -1,4 +1,3 @@
-// src/components/TaskEditor.tsx
 import { useState } from "react";
 import type { Task } from "../app/types";
 
@@ -6,22 +5,17 @@ type Props = {
   task: Task;
   onSave: (changes: Partial<Pick<Task, "title" | "description">>) => void;
   onDelete: () => void;
-  onCancel: () => void;
 };
 
-export default function TaskEditor({
-  task,
-  onSave,
-  onDelete,
-  onCancel,
-}: Props) {
-  // local editable fields (start from current task)
+export default function TaskEditor({ task, onSave, onDelete }: Props) {
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description ?? "");
 
+  // local editable fields (start from current task)
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const changes: Partial<Pick<Task, "title" | "description">> = {};
+    // Only include fields that actually changed
     if (title.trim() !== task.title) changes.title = title.trim();
     if (description !== (task.description ?? ""))
       changes.description = description;
@@ -32,6 +26,7 @@ export default function TaskEditor({
     <form onSubmit={handleSubmit} className="space-y-3">
       <h3 className="text-lg font-semibold">Edit task</h3>
 
+      {/* Title (required) */}
       <div className="space-y-1">
         <label className="text-sm opacity-80">Title</label>
         <input
@@ -42,6 +37,7 @@ export default function TaskEditor({
         />
       </div>
 
+      {/* Description (free text) */}
       <div className="space-y-1">
         <label className="text-sm opacity-80">Description</label>
         <textarea
@@ -52,6 +48,7 @@ export default function TaskEditor({
         />
       </div>
 
+      {/* Actions */}
       <div className="flex items-center justify-between pt-2">
         <button
           type="button"

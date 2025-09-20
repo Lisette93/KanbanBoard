@@ -1,8 +1,13 @@
 import "./index.css";
 import { useState } from "react";
 import Navbar from "./components/Navbar";
-import BoardPage from "./pages/BoardPage";
 import { Outlet } from "react-router-dom";
+
+/*
+ - Renders a global Navbar at the top.
+  - Provides "create task" modal state via Outlet context so pages can open/close it.
+  - Wraps children routes inside a main area.
+ */
 
 export default function App() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -11,7 +16,6 @@ export default function App() {
     <div className="min-h-screen bg-arcticDaisy">
       <Navbar onAddClick={() => setIsCreateOpen(true)} />
       <main className="p-6">
-        {/* Skicka state till barn-sidor via Outlet context */}
         <Outlet
           context={{
             createOpen: isCreateOpen,

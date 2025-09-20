@@ -1,4 +1,3 @@
-// src/components/CreateTaskModal.tsx
 import { useState } from "react";
 import Modal from "./Modal";
 
@@ -7,7 +6,6 @@ type ColumnLite = { id: string; title: string };
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-
   columns: ColumnLite[]; // columns to choose from
   defaultColumnId: string; // preselect column
   onCreate: (data: {
@@ -24,10 +22,12 @@ export default function CreateTaskModal({
   defaultColumnId,
   onCreate,
 }: Props) {
+  // Local controlled inputs
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [columnId, setColumnId] = useState(defaultColumnId);
 
+  // Submit handler: validate, send data up, reset, close
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const t = title.trim();
@@ -37,6 +37,7 @@ export default function CreateTaskModal({
       columnId,
       description: description.trim() || undefined,
     });
+    // Reset form after successful create
     setTitle("");
     setDescription("");
     setColumnId(defaultColumnId);
@@ -45,9 +46,11 @@ export default function CreateTaskModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
+      {/* role="dialog" is typically inside Modal; form is the content */}
       <form onSubmit={submit} className="space-y-3">
         <h3 className="text-lg font-semibold">Add new task</h3>
 
+        {/* Title input (required) */}
         <div className="space-y-1">
           <label className="text-sm opacity-80">Title</label>
           <input
@@ -58,6 +61,7 @@ export default function CreateTaskModal({
           />
         </div>
 
+        {/* Column selector */}
         <div className="space-y-1">
           <label className="text-sm opacity-80">Column</label>
           <select
@@ -73,6 +77,7 @@ export default function CreateTaskModal({
           </select>
         </div>
 
+        {/* Optional description */}
         <div className="space-y-1">
           <label className="text-sm opacity-80">Description (optional)</label>
           <textarea
@@ -83,6 +88,7 @@ export default function CreateTaskModal({
           />
         </div>
 
+        {/* Actions */}
         <div className="flex justify-end pt-2">
           <button
             type="submit"

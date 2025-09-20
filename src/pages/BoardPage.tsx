@@ -5,8 +5,6 @@ import ColumnView from "../components/ColumnView";
 import type { Task } from "../app/types";
 import TaskCard from "../components/TaskCard";
 import { useOutletContext } from "react-router-dom";
-//import { Link } from "react-router-dom";
-
 import {
   closestCorners,
   DndContext,
@@ -21,22 +19,25 @@ import { useNavigate } from "react-router-dom";
 import { useState, useMemo } from "react";
 import CreateTaskModal from "../components/CreateTaskModal";
 import bgImage from "../assets/images/pexels-louisabettes-captures-695499372-18016650.jpg";
+import type { LayoutCtx } from "../app/types";
 
 export default function BoardPage() {
   const { state, dispatch } = useBoard();
   const navigate = useNavigate();
 
+  //Read modal state from layout (Navbar button opens it)
   const { createOpen, onCloseCreate } = useOutletContext<LayoutCtx>();
 
-  // State for currently active task (for modal)
+  // Currently opened task in the editor modal
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
 
+  //Currently dragged task
   const [activeDragTaskId, setActiveDragTaskId] = useState<string | null>(null);
   const activeDragTask = activeDragTaskId
     ? state.tasks[activeDragTaskId]
     : undefined;
 
-  // Build a light list of columns for the modal’s select
+  // Column options for create modal
   const columnsLite = useMemo(
     () =>
       state.boards[state.ui.activeBoardId!].columnOrder
@@ -46,7 +47,7 @@ export default function BoardPage() {
     [state]
   );
 
-  // Make drag require a tiny movement → clicks won't be eaten by DnD
+  // Make drag require a tiny movement to avoid click-eating
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 6 },
@@ -58,10 +59,10 @@ export default function BoardPage() {
   if (!activeBoardId)
     return <p className="p-6 text-white">No board is active yet.</p>;
 
-  //Get the active board
+  //Current board
   const board = state.boards[activeBoardId];
 
-  // Decide the default column (usually “todo”, or just the first in order)
+  // Default column
   const defaultColumnId = columnsLite[0]?.id ?? "todo";
 
   // Create a new task (from global + button)
@@ -85,7 +86,7 @@ export default function BoardPage() {
     });
   }
 
-  // Utility: find which column currently contains a task id
+  //find which column currently contains a task id
   function getColumnIdByTaskId(taskId: string): string | undefined {
     return board.columnOrder.find((colId) =>
       state.columns[colId].taskIds.includes(taskId)
@@ -93,9 +94,7 @@ export default function BoardPage() {
   }
 
   // Handler for DnD end
-
   function handleDragStart(e: DragStartEvent) {
-    // e.active.id är task-id:t (du använder taskId som draggable id)
     setActiveDragTaskId(String(e.active.id));
   }
   function handleDragEnd(e: DragEndEvent) {
@@ -107,7 +106,7 @@ export default function BoardPage() {
     const fromColumnId = getColumnIdByTaskId(activeId);
     if (!fromColumnId) return;
 
-    // If `overId` is a task → use that task's column; if it's a column → drop into that column
+    // If we are over a task, drop into that task's column; else treat overId as a column id.
     const targetColByTask = getColumnIdByTaskId(overId);
     const toColumnId = targetColByTask ?? overId;
 
@@ -139,6 +138,7 @@ export default function BoardPage() {
         onDragEnd={handleDragEnd}
         collisionDetection={closestCorners}
       >
+        {/* Outer container: full-bleed on mobile, centered max width on ≥sm */}
         <div className="w-screen -mx-6 px-0 mt-8 sm:max-w-7xl sm:mx-auto sm:px-6">
           <div
             className="relative p-6 mt-8 rounded-2xl overflow-hidden bg-cover bg-center"
@@ -191,6 +191,7 @@ export default function BoardPage() {
             </div>
           </div>
         </div>
+        {/* Drag ghost: render the active task as a compact card during drag */}
         <DragOverlay>
           {activeDragTask ? (
             <div className="w-[280px] max-w-[90vw]">
@@ -234,7 +235,6 @@ export default function BoardPage() {
               });
               setActiveTaskId(null);
             }}
-            onCancel={() => setActiveTaskId(null)}
           />
         )}
       </Modal>

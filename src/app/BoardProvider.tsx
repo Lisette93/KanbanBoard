@@ -8,8 +8,10 @@ export default function BoardProvider({
 }: {
   children: React.ReactNode;
 }) {
+  // UseReducer initializes global state for the board
   const [state, dispatch] = useReducer(reducer, undefined, () => {
     try {
+      // Try to load state from localStorage
       const raw = localStorage.getItem("kanban-state");
       return raw ? (JSON.parse(raw) as AppState) : initialState;
     } catch {
@@ -21,6 +23,7 @@ export default function BoardProvider({
     localStorage.setItem("kanban-state", JSON.stringify(state));
   }, [state]);
 
+  // Provide state + dispatch to the rest of the app via Context
   return (
     <BoardContext.Provider value={{ state, dispatch }}>
       {children}
