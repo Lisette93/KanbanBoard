@@ -20,7 +20,7 @@ The app saves data in **localStorage** so your tasks stay even after refresh.
 ## 🚀 Live Demo
 
 👉 [View here](https://yourusername.github.io/kanban-board)  
-*(replace with your GitHub Pages link once deployed)*
+
 
 ---
 
@@ -31,14 +31,6 @@ The app saves data in **localStorage** so your tasks stay even after refresh.
 - dnd-kit (drag-and-drop)  
 - TailwindCSS v4  
 - LocalStorage API  
-
----
-
-## 📸 Screenshot
-
-![Kanban Board Screenshot](./screenshot.png)
-
----
 
 ## 📦 Getting Started
 
