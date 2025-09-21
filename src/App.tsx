@@ -15,7 +15,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-arcticDaisy">
       <Navbar onAddClick={() => setIsCreateOpen(true)} />
-      <main className="p-6">
+      <main className="">
         <Outlet
           context={{
             createOpen: isCreateOpen,

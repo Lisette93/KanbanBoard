@@ -3,13 +3,18 @@ import App from "./App";
 import BoardPage from "./pages/BoardPage";
 import ColumnPage from "./pages/ColumnPage";
 
-export const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-    children: [
-      { path: "/", element: <BoardPage /> },
-      { path: "/column/:columnId", element: <ColumnPage /> },
-    ],
-  },
-]);
+const basename = import.meta.env.BASE_URL;
+
+export const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <App />,
+      children: [
+        { path: "/", element: <BoardPage /> },
+        { path: "/column/:columnId", element: <ColumnPage /> },
+      ],
+    },
+  ],
+  { basename }
+);

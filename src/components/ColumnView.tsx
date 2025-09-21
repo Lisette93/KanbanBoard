@@ -56,9 +56,9 @@ export default function ColumnView({
 
   return (
     <section
-      className={` rounded-lg p-6 m-4 ${
+      className={` w-full rounded-lg p-6 ${
         columnColors[columnId] ?? "bg-n"
-      } min-h-[80vh]`}
+      } min-h-[68dvh] md:min-h-[70dvh] lg:min-h-[72dvh]`}
     >
       {/* Header */}
       <header
@@ -79,7 +79,10 @@ export default function ColumnView({
         />
       </header>
 
-      <div ref={setNodeRef} className="space-y-2 min-h-[12px] overflow-auto">
+      <div
+        ref={setNodeRef}
+        className="space-y-2 min-h-[12px]max-h-[calc(100%-1rem)] overflow-auto touch-pan-y"
+      >
         <SortableContext
           id={columnId}
           items={tasks.map((t) => t.id)}

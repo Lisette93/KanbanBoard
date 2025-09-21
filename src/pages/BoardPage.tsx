@@ -133,30 +133,53 @@ export default function BoardPage() {
     <main className="p-6">
       {/* DnD Context */}
       <DndContext
-        sensors={sensors}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
+        sensors={sensors} // small distance to avoid accidental drags on click
+        onDragStart={handleDragStart} // set dragging id
+        onDragEnd={handleDragEnd} // move between columns, clear dragging id
         collisionDetection={closestCorners}
       >
-        {/* Outer container: full-bleed on mobile, centered max width on ≥sm */}
+        {/* Background wrapper */}
         <div className="w-screen -mx-6 px-0 mt-8 sm:max-w-7xl sm:mx-auto sm:px-6">
           <div
-            className="relative p-6 mt-8 rounded-2xl overflow-hidden bg-cover bg-center"
+            className="relative p-6 pb-10 mt-8 rounded-2xl overflow-hidden 
+            bg-cover md:bg-cover
+            bg-[position:center_30%] md:bg-center min-h-[80vh] "
             style={{ backgroundImage: `url(${bgImage})` }}
           >
+            {/*side fade edges on mobile only*/}
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-6 bg-gradient-to-r from-white/70 to-transparent md:block lg:hidden" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-white/70 to-transparent md:block lg:hidden" />
+
+            {/* Pager-dots: mobil */}
+            <div className="lg:hidden pointer-events-none absolute inset-x-0 bottom-2 z-10 flex justify-center gap-2">
+              {board.columnOrder.map((_, i) => (
+                <span key={i} className="h-2 w-2 rounded-full bg-white" />
+              ))}
+            </div>
+
             {/* Overlay */}
+            <div className="absolute inset-0 -z-10" />
             <div className="absolute inset-0 bg-white/40 pointer-events-none" />
 
             {/* content layer */}
             <div className="relative z-10 p-4 sm:p-6 lg:p-8">
+              {/*Responsiv layout 
+              -mobile 
+              -Ipad */}
               <div
                 className="
-            flex gap-4 overflow-x-auto snap-x snap-mandatory pb-3
+            flex gap-4 overflow-x-auto snap-x snap-proximity pb-4
             [scrollbar-width:none] [&::-webkit-scrollbar]:hidden
-            sm:grid sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:pb-0
-            lg:grid-cols-3
+            overscroll-x-contain
+
+            md:flex md:overflow-x-auto md:snap-x md:snap-proximity md:pb-4
+            md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden
+
+            lg:grid lg:gap-6 lg:overflow-visible lg:pb-0
+            lg:[grid-template-columns:repeat(3,minmax(360px,1fr))]
             w-full
-          "
+            "
+                style={{ WebkitOverflowScrolling: "touch" }}
               >
                 {board.columnOrder.map((colId) => {
                   const col = state.columns[colId];
@@ -169,7 +192,10 @@ export default function BoardPage() {
                   return (
                     <div
                       key={col.id}
-                      className="flex-shrink-0 min-w-[85%] snap-center sm:min-w-0"
+                      className="
+                      flex-none w-[92%] min-w-[320px] md:min-w-[360px]
+                      snap-start [scroll-snap-stop:always]
+                      md:w-auto"
                     >
                       <ColumnView
                         columnId={col.id}
