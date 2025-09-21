@@ -5,7 +5,7 @@ type TaskCardProps = {
   task: Task;
   onClick?: () => void;
   onDelete?: () => void;
-  isDragging?: boolean; // får du från SortableItem
+  isDragging?: boolean;
 };
 
 export default function TaskCard({
@@ -17,8 +17,9 @@ export default function TaskCard({
   const startRef = useRef<{ x: number; y: number } | null>(null);
   const movedRef = useRef(false);
   const cancelClickRef = useRef(false);
-  const THRESHOLD = 6; // px
+  const THRESHOLD = 6;
 
+  // When dnd-kit reports dragging, cancel clicks for a short time
   useEffect(() => {
     if (isDragging) {
       cancelClickRef.current = true;
@@ -41,6 +42,7 @@ export default function TaskCard({
   };
 
   const onPointerUp = () => {
+    // Only open modal if not dragging
     if (movedRef.current || cancelClickRef.current || isDragging) return;
     onClick?.();
   };
@@ -56,6 +58,7 @@ export default function TaskCard({
       onPointerUp={onPointerUp}
       className="group cursor-pointer rounded-xl bg-white p-4 shadow-md transition hover:shadow-lg focus:outline-none"
     >
+      {/* Header with "Task" + delete button */}
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="rounded-full bg-peachBlossom/60 px-2 py-0.5 text-xs font-semibold text-plumPurple">
           Task
@@ -79,6 +82,7 @@ export default function TaskCard({
         )}
       </div>
 
+      {/* Task content */}
       <h3 className="truncate font-semibold text-plumPurple">{task.title}</h3>
       {task.description && (
         <p className="mt-1 line-clamp-2 text-sm text-brownSugar/80">
